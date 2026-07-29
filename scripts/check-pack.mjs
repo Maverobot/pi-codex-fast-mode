@@ -13,10 +13,16 @@ const expectedFiles = [
 	"package.json",
 ].sort();
 
-const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
-const result = spawnSync(npmCommand, ["pack", "--dry-run", "--json", "--ignore-scripts"], {
+const packArguments = ["pack", "--dry-run", "--json", "--ignore-scripts"];
+const npmExecPath = process.env.npm_execpath;
+const command = npmExecPath ? process.execPath : "npm";
+const commandArguments = npmExecPath ? [npmExecPath, ...packArguments] : packArguments;
+const result = spawnSync(command, commandArguments, {
 	cwd: process.cwd(),
 	encoding: "utf8",
+	// Direct npm fallback needs cmd.exe on Windows. Normal npm-script execution uses
+	// npm_execpath above and never invokes a shell.
+	shell: !npmExecPath && process.platform === "win32",
 });
 
 if (result.error) throw result.error;
