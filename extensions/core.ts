@@ -9,7 +9,7 @@ export interface ModelDescriptor {
 	readonly id: string;
 }
 
-export type FastCommand = "on" | "off" | "status";
+export type FastCommand = "toggle" | "on" | "off" | "status";
 
 export type FastPayloadResult =
 	| {
@@ -56,7 +56,7 @@ export function modelReference(model: ModelDescriptor | undefined): string {
 
 export function parseFastCommand(args: string): FastCommand | undefined {
 	const command = args.trim().toLowerCase();
-	if (command === "") return "status";
+	if (command === "") return "toggle";
 	if (command === "on" || command === "off" || command === "status") return command;
 	return undefined;
 }

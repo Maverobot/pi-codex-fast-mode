@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: "24"
-          cache: npm
+          package-manager-cache: false
           registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
@@ -51,9 +51,7 @@ jobs:
       - name: Run release checks
         run: npm run release:check
 
-      # Authenticates via npm trusted publishing (OIDC) when configured for this
-      # package; otherwise falls back to NPM_TOKEN. prepublishOnly reruns the
-      # full release gate as a last line of defence.
+      # prepublishOnly reruns the full release gate as a last line of defence.
       - name: Publish
         run: npm publish
         env:

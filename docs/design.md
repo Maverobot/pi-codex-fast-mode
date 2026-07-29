@@ -90,21 +90,22 @@ Precedence is:
 2. Otherwise, the saved preference applies.
 3. Missing, unreadable, malformed, or unknown-version state defaults to off.
 
-`/fast on`, `/fast off`, and `/fast status` execute through an in-process command queue so overlapping commands have deterministic state and notifications. Persistence creates an unpredictable temporary file exclusively in the same directory, syncs it, then renames it over the preference on POSIX. Windows receives a fail-safe delete-and-rename fallback because its rename behavior differs when the destination exists; interruption in that non-atomic fallback leaves state absent, which defaults to off.
+`/fast` toggles, while `/fast on`, `/fast off`, and `/fast status` provide explicit controls. All state-changing forms execute through an in-process command queue so overlapping commands have deterministic state and notifications. Persistence creates an unpredictable temporary file exclusively in the same directory, syncs it, then renames it over the preference on POSIX. Windows receives a fail-safe delete-and-rename fallback because its rename behavior differs when the destination exists; interruption in that non-atomic fallback leaves state absent, which defaults to off.
 
 The file contains no secrets. It is created with mode `0600` where the platform honors POSIX modes.
 
 ## Command safety
 
-Commands are explicit:
+The primary command is a toggle, with explicit alternatives:
 
 ```text
+/fast
 /fast on | off | status
 ```
 
-Bare `/fast` means `status`, not toggle. An accidental toggle is inappropriate because Fast mode materially increases credit consumption.
+Bare `/fast` toggles and persists the preference. `/fast on` and `/fast off` remain available for idempotent control, while `/fast status` is read-only. Because Fast mode materially increases credit consumption, every activation reports the expected speed and credit multipliers and the footer remains visible while the preference is active.
 
-Activation reports expected speed and credit multipliers for the current eligible model. Messages consistently say the extension *requests* Fast mode because the backend can downgrade or reject service-tier requests.
+Messages consistently say the extension *requests* Fast mode because the backend can downgrade or reject service-tier requests.
 
 ## Conflict behavior
 
@@ -155,9 +156,9 @@ Reasoning effort changes capability/latency tradeoffs independently of service t
 
 Read-modify-write on a shared file risks clobbering unrelated settings and makes ownership unclear. Package state belongs in a namespaced state file.
 
-### Bare toggle command
+### Requiring an explicit `on` argument
 
-Toggles are concise but make accidental paid activation too easy. Bare `/fast` reports status.
+Requiring `/fast on` makes paid activation unambiguous, but adds friction to the primary interactive workflow. Bare `/fast` instead toggles the preference, with immediate cost messaging and a persistent footer indicator; the explicit `on`, `off`, and `status` forms remain available.
 
 ### Generic model allowlist
 

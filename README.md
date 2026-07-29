@@ -29,11 +29,11 @@ That diff is the entire product. Everything below is about handling it carefully
 ## Commands
 
 | Command | What it does |
-|---|---|
-| `/fast on` | Request Fast mode on eligible requests, and save the preference |
-| `/fast off` | Stop modifying requests, and save the preference |
-| `/fast status` | Report the preference, and whether it is active on this model |
-| `/fast` | Same as `status` — a bare command never toggles an expensive feature |
+| --- | --- |
+| `/fast` | Toggle Fast mode and save the preference |
+| `/fast on` | Explicitly enable Fast mode and save the preference |
+| `/fast off` | Explicitly disable Fast mode and save the preference |
+| `/fast status` | Report the preference and whether it is active on this model |
 | `pi --fast` | Enable for one pi process only; never written to disk |
 
 While active on an eligible model, pi's footer shows `⚡ fast`. If the preference is on but the selected model is not eligible, it shows `⚡ fast (inactive)` and requests go out unchanged.
@@ -41,7 +41,7 @@ While active on an eligible model, pi's footer shows `⚡ fast`. If the preferen
 ## Install
 
 ```bash
-pi install npm:pi-codex-fast-mode      # once published
+pi install npm:pi-codex-fast-mode
 pi install ~/Dev/pi-codex-fast-mode    # local development
 ```
 
@@ -52,14 +52,14 @@ Restart pi after installing. Do not install the local path and the npm package a
 The exact text the extension emits, on `openai-codex/gpt-5.6-sol`:
 
 ```text
-❯ /fast
+❯ /fast status
 Fast mode is off. This extension is not modifying provider requests.
 
-❯ /fast on
+❯ /fast
 Fast mode enabled for openai-codex/gpt-5.6-sol: ~1.5× speed and ~2.5× credits.
 Requests ask for service_tier=priority; the backend may downgrade them.
 
-❯ /fast off
+❯ /fast
 Fast mode disabled. This extension no longer modifies provider requests.
 ```
 
@@ -112,7 +112,7 @@ OpenAI's user-facing Codex configuration calls this tier `fast`. The Codex clien
 
 ## Safety model
 
-- **Off by default, and explicit to turn on.** Missing, malformed, or future-version state defaults to off — a bad file cannot enable a paid mode.
+- **Off by default, with visible paid activation.** Missing, malformed, or future-version state defaults to off. Toggling on immediately reports the expected credit multiplier and adds the footer indicator.
 - **The incoming payload is never mutated.** The hook returns a shallow copy differing by one key, and returns nothing at all when disabled or ineligible.
 - **`--fast` cannot become persistent.** It applies to one process and is never written to disk.
 - **No failure here blocks a request.** An unusable payload, a failed write, or an ineligible model degrades to leaving the request alone, plus a one-time warning.

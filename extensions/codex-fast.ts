@@ -89,7 +89,7 @@ export function registerCodexFastMode(
 	});
 
 	pi.registerCommand("fast", {
-		description: "Request Codex Fast mode: /fast on | off | status",
+		description: "Toggle Codex Fast mode (or use on, off, status)",
 		getArgumentCompletions: (prefix) => {
 			const normalized = prefix.trim().toLowerCase();
 			return COMMAND_VALUES.flatMap((value) =>
@@ -99,7 +99,7 @@ export function registerCodexFastMode(
 		handler: async (args, ctx) => {
 			const command = parseFastCommand(args);
 			if (!command) {
-				ctx.ui.notify("Usage: /fast on | off | status", "error");
+				ctx.ui.notify("Usage: /fast [on | off | status]", "error");
 				return;
 			}
 
@@ -109,7 +109,7 @@ export function registerCodexFastMode(
 					return;
 				}
 
-				const nextEnabled = command === "on";
+				const nextEnabled = command === "toggle" ? !enabled : command === "on";
 				enabled = nextEnabled;
 				warnedAboutConflict = false;
 				warnedAboutInvalidPayload = false;

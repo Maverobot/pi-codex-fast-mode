@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file. The format 
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-07-30
+
+### Changed
+
+- Bare `/fast` now toggles and persists Fast mode; `/fast on`, `/fast off`, and `/fast status` remain available as explicit controls.
+
 ## [0.1.0] — 2026-07-29
 
 ### Added

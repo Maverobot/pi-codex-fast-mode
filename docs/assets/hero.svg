@@ -18,7 +18,7 @@
   <circle cx="160" cy="228" r="7" fill="#27c93f"/>
 
   <g font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="19">
-    <text x="112" y="284" fill="#7aa2f7">❯ /fast on</text>
+    <text x="112" y="284" fill="#7aa2f7">❯ /fast</text>
   </g>
 
   <g font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="18">

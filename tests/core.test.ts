@@ -39,7 +39,7 @@ describe("getFastCreditMultiplier", () => {
 
 describe("parseFastCommand", () => {
 	it.each([
-		["", "status"],
+		["", "toggle"],
 		["  STATUS ", "status"],
 		["on", "on"],
 		["OFF", "off"],

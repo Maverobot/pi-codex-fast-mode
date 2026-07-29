@@ -161,12 +161,12 @@ describe("Codex Fast mode extension", () => {
 		).toEqual({ model: "gpt-5.6-sol", service_tier: "priority" });
 	});
 
-	it("serializes overlapping paid-state commands", async () => {
+	it("serializes overlapping bare toggles", async () => {
 		const harness = await createHarness();
 		await harness.emit("session_start", { type: "session_start" });
 		await Promise.all([
-			harness.command.handler("on", harness.context),
-			harness.command.handler("off", harness.context),
+			harness.command.handler("", harness.context),
+			harness.command.handler("", harness.context),
 		]);
 
 		const messages = harness.notifications.map((notification) => notification.message);
@@ -193,15 +193,43 @@ describe("Codex Fast mode extension", () => {
 		expect(harness.notifications.at(-1)?.message).toContain("could not be saved");
 	});
 
-	it("reports status for bare /fast and rejects invalid arguments", async () => {
+	it("toggles and persists with bare /fast", async () => {
 		const harness = await createHarness();
 		await harness.emit("session_start", { type: "session_start" });
+
 		await harness.command.handler("", harness.context);
+		expect((await loadFastState(harness.agentDir)).state.enabled).toBe(true);
+		expect(harness.statuses.get("codex-fast-mode")).toBe("⚡ fast");
+		expect(harness.notifications.at(-1)?.message).toContain("Fast mode enabled");
+		expect(
+			await harness.emit("before_provider_request", {
+				type: "before_provider_request",
+				payload: { model: "gpt-5.6-sol" },
+			}),
+		).toEqual({ model: "gpt-5.6-sol", service_tier: "priority" });
+
+		await harness.command.handler("", harness.context);
+		expect((await loadFastState(harness.agentDir)).state.enabled).toBe(false);
+		expect(harness.statuses.get("codex-fast-mode")).toBeUndefined();
+		expect(harness.notifications.at(-1)?.message).toContain("Fast mode disabled");
+		expect(
+			await harness.emit("before_provider_request", {
+				type: "before_provider_request",
+				payload: { model: "gpt-5.6-sol" },
+			}),
+		).toBeUndefined();
+	});
+
+	it("keeps explicit status read-only and rejects invalid arguments", async () => {
+		const harness = await createHarness();
+		await harness.emit("session_start", { type: "session_start" });
+		await harness.command.handler("status", harness.context);
 		expect(harness.notifications.at(-1)?.message).toContain("Fast mode is off");
+		expect((await loadFastState(harness.agentDir)).state.enabled).toBe(false);
 
 		await harness.command.handler("toggle", harness.context);
 		expect(harness.notifications.at(-1)).toEqual({
-			message: "Usage: /fast on | off | status",
+			message: "Usage: /fast [on | off | status]",
 			level: "error",
 		});
 	});
