@@ -1,0 +1,69 @@
+{
+	"name": "pi-codex-fast-mode",
+	"version": "0.1.0",
+	"private": true,
+	"description": "A correctness-first OpenAI Codex Fast mode extension for Pi: explicit, persistent, provider-scoped, and honest about cost and backend downgrades.",
+	"type": "module",
+	"license": "MIT",
+	"author": "Sirui Zhang",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/SI-RUI-ZHANG/pi-codex-fast-mode.git"
+	},
+	"homepage": "https://github.com/SI-RUI-ZHANG/pi-codex-fast-mode#readme",
+	"bugs": {
+		"url": "https://github.com/SI-RUI-ZHANG/pi-codex-fast-mode/issues"
+	},
+	"keywords": [
+		"pi-package",
+		"pi-extension",
+		"pi-coding-agent",
+		"openai",
+		"codex",
+		"fast-mode",
+		"service-tier",
+		"priority"
+	],
+	"files": [
+		"extensions/codex-fast.ts",
+		"extensions/core.ts",
+		"extensions/state.ts",
+		"docs/design.md",
+		"CHANGELOG.md",
+		"CONTRIBUTING.md",
+		"SECURITY.md"
+	],
+	"pi": {
+		"extensions": [
+			"./extensions/codex-fast.ts"
+		]
+	},
+	"engines": {
+		"node": ">=22.19.0"
+	},
+	"peerDependencies": {
+		"@earendil-works/pi-coding-agent": ">=0.82.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.6",
+		"@earendil-works/pi-coding-agent": "^0.82.1",
+		"@types/node": "^22.20.1",
+		"typescript": "^5.9.3",
+		"vitest": "^4.1.10"
+	},
+	"scripts": {
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"check": "tsc --noEmit",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"audit:shipped": "npm audit --omit=dev --audit-level=high",
+		"pack:check": "node scripts/check-pack.mjs",
+		"release:check": "npm run lint && npm run check && npm test && npm run audit:shipped && npm run pack:check",
+		"prepublishOnly": "npm run release:check"
+	},
+	"publishConfig": {
+		"access": "public",
+		"provenance": true
+	}
+}

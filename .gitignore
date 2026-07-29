@@ -1,0 +1,16 @@
+node_modules/
+coverage/
+dist/
+*.tgz
+*.tsbuildinfo
+.DS_Store
+
+# Private working layer; maintained as a separate repository.
+internal/
+AGENTS.md
+.agents
+
+# Local agent and review artifacts.
+.pi/
+.pi-subagents/
+.pi-worktrees/
