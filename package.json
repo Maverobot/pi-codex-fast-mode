@@ -1,7 +1,6 @@
 {
 	"name": "pi-codex-fast-mode",
 	"version": "0.1.0",
-	"private": true,
 	"description": "A correctness-first OpenAI Codex Fast mode extension for Pi: explicit, persistent, provider-scoped, and honest about cost and backend downgrades.",
 	"type": "module",
 	"license": "MIT",
