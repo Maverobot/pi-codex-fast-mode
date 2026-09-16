@@ -29,8 +29,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function fastModelVersion(model: ModelDescriptor | undefined): "5.4" | "5.5" | "5.6" | undefined {
+function fastModelVersion(
+	model: ModelDescriptor | undefined,
+): "5.4" | "5.5" | "5.6" | "6-astra" | undefined {
 	if (!model || model.provider !== CODEX_PROVIDER) return undefined;
+	if (model.id === "gpt-6-astra") return "6-astra";
 	const match = SUPPORTED_MODEL_PATTERN.exec(model.id);
 	const version = match?.[1];
 	if (version === "4") return "5.4";
@@ -46,8 +49,14 @@ export function isFastEligible(model: ModelDescriptor | undefined): boolean {
 export function getFastCreditMultiplier(model: ModelDescriptor | undefined): number | undefined {
 	const version = fastModelVersion(model);
 	if (version === "5.4") return 2;
-	if (version === "5.5" || version === "5.6") return 2.5;
+	if (version === "5.5" || version === "5.6" || version === "6-astra") return 2.5;
 	return undefined;
+}
+
+export function getFastSpeedMultiplier(model: ModelDescriptor | undefined): number | undefined {
+	const version = fastModelVersion(model);
+	// OpenAI documents a speed multiplier only for the supported GPT-5 families.
+	return version && version !== "6-astra" ? EXPECTED_SPEED_MULTIPLIER : undefined;
 }
 
 export function modelReference(model: ModelDescriptor | undefined): string {

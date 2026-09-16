@@ -22,7 +22,7 @@ Codex sells a faster processing tier at a higher credit rate. pi has no built-in
   }
 ```
 
-That diff is the entire product. Everything below is about handling it carefully — because the field roughly doubles your credit burn, and the backend is free to ignore it.
+That diff is the entire product. Everything below is about handling it carefully — because Fast mode consumes 2–2.5× Standard credits on supported models, and the backend is free to ignore it.
 
 > **Fast is a paid preference, not a guarantee.** The extension asks the Codex backend for Priority processing. OpenAI may reject or downgrade the requested tier, and a request hook cannot observe which tier actually served the response.
 
@@ -40,12 +40,15 @@ While active on an eligible model, pi's footer shows `⚡ fast`. If the preferen
 
 ## Install
 
+This is [Maverobot's fork](https://github.com/Maverobot/pi-codex-fast-mode) of [SI-RUI-ZHANG/pi-codex-fast-mode](https://github.com/SI-RUI-ZHANG/pi-codex-fast-mode), adding GPT-6 Astra support. Install the fork from Git; `npm:pi-codex-fast-mode` is the upstream package.
+
 ```bash
-pi install npm:pi-codex-fast-mode
-pi install ~/Dev/pi-codex-fast-mode    # local development
+pi install git:github.com/Maverobot/pi-codex-fast-mode
+# Alternatively, for local development:
+pi install ~/Dev/pi-codex-fast-mode
 ```
 
-Restart pi after installing. Do not install the local path and the npm package at the same time — duplicate discovery registers the command and hook twice.
+Append `@` and a reviewed commit hash to the Git source to pin a revision. Restart pi after installing. Keep only one Fast-mode source installed: fork, npm, and local-path installs must not coexist because duplicate discovery registers the command and hook twice.
 
 ## What it looks like
 
@@ -63,7 +66,9 @@ Requests ask for service_tier=priority; the backend may downgrade them.
 Fast mode disabled. This extension no longer modifies provider requests.
 ```
 
-Switch to a model outside the eligible families and the preference survives, but nothing is sent:
+On `openai-codex/gpt-6-astra`, activation reports `2.5× credits where available`, without a fixed speed multiplier.
+
+Switch to an ineligible model and the preference survives, but requests remain unchanged:
 
 ```text
 ❯ /fast status
@@ -76,16 +81,17 @@ Both conditions must hold:
 
 ```text
 provider == openai-codex
-model    == /^gpt-5\.(4|5|6)(?:$|-)/
+model    == /^gpt-5\.(4|5|6)(?:$|-)/ OR exactly gpt-6-astra
 ```
 
-The family regex accepts named variants such as `gpt-5.6-sol` without maintaining a brittle allowlist. Adding a family requires a source-backed code change and a release.
+The GPT-5 family regex accepts named variants such as `gpt-5.6-sol`. GPT-6 support is limited to the exact `gpt-6-astra` ID listed in [OpenAI's Codex models documentation](https://developers.openai.com/codex/models); other GPT-6 IDs and Astra suffixes are not eligible. Expanding eligibility requires a source-backed code change.
 
-| Model family | Expected speed | Credit usage |
+| Model | Expected speed | Credit usage |
 | --- | ---: | ---: |
 | GPT-5.4 | about 1.5× | about 2× |
 | GPT-5.5 | about 1.5× | about 2.5× |
 | GPT-5.6 | about 1.5× | about 2.5× |
+| GPT-6 Astra (`gpt-6-astra` only) | No fixed multiplier documented | 2.5× Standard where available |
 
 These are OpenAI's published figures from the [Codex speed documentation](https://developers.openai.com/codex/speed), not measurements taken here, and they can change. This package ships no benchmarks of its own; if you run one, see the reporting bar in [CONTRIBUTING.md](./CONTRIBUTING.md).
 

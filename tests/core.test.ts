@@ -11,15 +11,25 @@ import {
 const codex = (id: string): ModelDescriptor => ({ provider: "openai-codex", id });
 
 describe("isFastEligible", () => {
-	it.each(["gpt-5.4", "gpt-5.4-mini", "gpt-5.5", "gpt-5.6-luna", "gpt-5.6-sol", "gpt-5.6-terra"])(
-		"accepts supported Codex model %s",
-		(id) => {
-			expect(isFastEligible(codex(id))).toBe(true);
-		},
-	);
+	it.each([
+		"gpt-5.4",
+		"gpt-5.4-mini",
+		"gpt-5.5",
+		"gpt-5.6-luna",
+		"gpt-5.6-sol",
+		"gpt-5.6-terra",
+		"gpt-6-astra",
+	])("accepts supported Codex model %s", (id) => {
+		expect(isFastEligible(codex(id))).toBe(true);
+	});
 
 	it.each([
 		{ provider: "openai", id: "gpt-5.6-sol" },
+		{ provider: "openai", id: "gpt-6-astra" },
+		{ provider: "openai-codex", id: "gpt-6" },
+		{ provider: "openai-codex", id: "gpt-6-astra-mini" },
+		{ provider: "openai-codex", id: "gpt-6-astra-preview" },
+		{ provider: "openai-codex", id: "gpt-6-other" },
 		{ provider: "openai-codex", id: "gpt-5.3-codex" },
 		{ provider: "anthropic", id: "claude-opus-4-6" },
 	])("rejects $provider/$id", (model) => {
@@ -32,9 +42,12 @@ describe("getFastCreditMultiplier", () => {
 		expect(getFastCreditMultiplier(codex("gpt-5.4"))).toBe(2);
 	});
 
-	it.each(["gpt-5.5", "gpt-5.6-sol"])("uses the documented multiplier for %s", (id) => {
-		expect(getFastCreditMultiplier(codex(id))).toBe(2.5);
-	});
+	it.each(["gpt-5.5", "gpt-5.6-sol", "gpt-6-astra"])(
+		"uses the documented multiplier for %s",
+		(id) => {
+			expect(getFastCreditMultiplier(codex(id))).toBe(2.5);
+		},
+	);
 });
 
 describe("parseFastCommand", () => {

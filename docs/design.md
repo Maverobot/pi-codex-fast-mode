@@ -44,7 +44,7 @@ Before each provider request:
 
 1. Exit without returning a payload when the preference is off.
 2. Require provider `openai-codex`.
-3. Require a GPT-5.4, GPT-5.5, or GPT-5.6 model ID.
+3. Require a GPT-5.4, GPT-5.5, or GPT-5.6 family model ID, or exactly `gpt-6-astra`.
 4. Require a record-shaped payload.
 5. return a shallow copy with `service_tier: "priority"`.
 
@@ -62,14 +62,14 @@ References:
 
 ## Eligibility
 
-The matcher is intentionally provider-scoped and family-based:
+The matcher is intentionally provider-scoped, with GPT-5 families and one exact GPT-6 ID:
 
 ```text
 provider == openai-codex
-model    == /^gpt-5\.(4|5|6)(?:$|-)/
+model    == /^gpt-5\.(4|5|6)(?:$|-)/ OR exactly gpt-6-astra
 ```
 
-This accepts named variants such as `gpt-5.6-sol` without maintaining a brittle variant allowlist. Expanding to another family requires a source-backed code change and release.
+This accepts GPT-5 named variants such as `gpt-5.6-sol`. The exact `gpt-6-astra` ID is documented in [Codex models](https://developers.openai.com/codex/models); no other GPT-6 IDs or Astra suffixes are enabled. Expanding eligibility requires a source-backed code change.
 
 The `openai` API-key provider is excluded. API Priority Processing has separate billing and operational semantics and should not be enabled implicitly by a ChatGPT Codex extension.
 
@@ -103,7 +103,7 @@ The primary command is a toggle, with explicit alternatives:
 /fast on | off | status
 ```
 
-Bare `/fast` toggles and persists the preference. `/fast on` and `/fast off` remain available for idempotent control, while `/fast status` is read-only. Because Fast mode materially increases credit consumption, every activation reports the expected speed and credit multipliers and the footer remains visible while the preference is active.
+Bare `/fast` toggles and persists the preference. `/fast on` and `/fast off` remain available for idempotent control, while `/fast status` is read-only. Because Fast mode materially increases credit consumption, eligible command activation reports the documented credit multiplier and the footer remains visible while the preference is active. GPT-5.4/5.5/5.6 retain their expected 1.5× speed disclosure. GPT-6 Astra reports 2.5× Standard credits where available, without a speed multiplier: [Codex speed documentation](https://developers.openai.com/codex/speed) gives no fixed Astra speed estimate.
 
 Messages consistently say the extension *requests* Fast mode because the backend can downgrade or reject service-tier requests.
 
@@ -162,7 +162,7 @@ Requiring `/fast on` makes paid activation unambiguous, but adds friction to the
 
 ### Generic model allowlist
 
-An unbounded `openai-codex/*` matcher could send unsupported service tiers. A documented family matcher is conservative while still accepting named variants.
+An unbounded `openai-codex/*` matcher could send unsupported service tiers. The documented GPT-5 family matcher accepts named variants; Astra uses an exact-ID check so undocumented GPT-6 models remain excluded.
 
 ## Verification
 

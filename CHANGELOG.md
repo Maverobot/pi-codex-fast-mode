@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file. The format 
 
 ## [Unreleased]
 
+### Added
+
+- Fast-mode eligibility for exactly `openai-codex/gpt-6-astra` in Maverobot's fork, preserving existing GPT-5 support and provider restrictions.
+
+### Changed
+
+- Astra activation reports the documented 2.5× Standard credit rate where available, without claiming a fixed speed multiplier. Requests still ask for Priority; backend acceptance is not guaranteed.
+- Document fork installation and exact Astra eligibility using OpenAI's [models](https://developers.openai.com/codex/models) and [speed](https://developers.openai.com/codex/speed) documentation.
+
 ## [0.2.0] — 2026-07-30
 
 ### Changed
